@@ -16,7 +16,10 @@ module.exports = function(grunt) {
         var log = grunt.log;
 
         if (!code) {
-            result.stdout.split('\n').forEach(log.ok, log);
+            (result.stdout || result.stderr).split('\n').forEach(function(lineOutput) {
+                log.ok(lineOutput);
+                return;
+            });
             return null;
         }
 
@@ -47,6 +50,17 @@ module.exports = function(grunt) {
 
     grunt.registerMultiTask('bats', 'Bats is a test framework for shell', function() {
         var files = this.filesSrc;
+        var options = this.options();
+        if (options.p) {
+            files.push('-p');
+        }
+        else if (options.t) {
+            files.push('-t');
+        }
+        else if (options.c) {
+            files.push('-c');
+        }
+
         var done = this.async();
 
         grunt.log.writeln('Running shell tests...');
